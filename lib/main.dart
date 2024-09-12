@@ -22,6 +22,46 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Socket? _primarySocket;
   late Socket _secondarySocket;
+
+  void _startProxyServer() async {
+    final host = '188.245.104.81'; 
+    // final host = '192.168.8.165'; 
+    final port = 8000; 
+
+    try {
+      // Starting the primary connection (equivalent to Bootstrap.connect())
+      _primarySocket = await Socket.connect(host, port);
+
+      _primarySocket!.listen(
+        (data) {
+          _handlePrimaryConnectionData(data, host, port);
+        },
+        onDone: () {
+          print('Primary connection closed');
+          _primarySocket!.close();
+        },
+        onError: (error) {
+          print('Primary connection error: $error');
+          _primarySocket!.close();
+        },
+      );
+    } catch (e) {
+      print('Failed to connect to primary connection: $e');
+    }
+  }
+
+  }
+
+  void _startSecondaryConnection(String host, int port) async {           //The part where the Java code uses NioEventLoopGroup, Bootstrap, and creates a new connection is represented in Dart as a simple socket connection using Socket.connect():
+    try {
+      _secondarySocket = await Socket.connect(host, port);
+      print('Connected to $host:$port (Secondary Connection)');
+      Socks5ServerHandler obj = Socks5ServerHandler(_secondarySocket);
+      obj.start();
+
+    } catch (e) {
+      print('Failed to connect to secondary channel: $e');
+    }
   }
 
   @override
