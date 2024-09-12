@@ -14,6 +14,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  Socket? _primarySocket;
+  late Socket _secondarySocket;
+  }
 
   @override
   void dispose() {
