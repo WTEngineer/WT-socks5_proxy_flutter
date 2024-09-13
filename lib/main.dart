@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'socks5_server.dart';
 
 void main() {
   runApp(MyApp());
@@ -50,6 +51,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _handlePrimaryConnectionData(List<int> data, String host, int port) {
+    if (data.isNotEmpty) {
+      final receivedByte = data[0];
+      print('Received data from primary connection: $receivedByte');
+      if (receivedByte == 55) {
+        print('Received byte 55, initiating secondary connection');
+        _startSecondaryConnection(host, port);
+      }
+    }
   }
 
   void _startSecondaryConnection(String host, int port) async {           //The part where the Java code uses NioEventLoopGroup, Bootstrap, and creates a new connection is represented in Dart as a simple socket connection using Socket.connect():
