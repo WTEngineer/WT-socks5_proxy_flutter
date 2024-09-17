@@ -40,6 +40,19 @@ class Socks5ServerHandler {
     });
   }
 
+  String parseAddress(List<int> data, int addrType) {
+    switch (addrType) {
+      case 0x01: // IPv4
+        return data.sublist(4, 8).join('.');
+      case 0x04: // IPv6
+        return '::1';
+      case 0x03: // Domain name
+        final domainLength = data[4];
+        return String.fromCharCodes(data.sublist(5, 5 + domainLength));
+      default:
+        throw Exception('Unknown address type: $addrType');
+    }
+  }
 }
 
 enum States { handshake, handling, proxying }
