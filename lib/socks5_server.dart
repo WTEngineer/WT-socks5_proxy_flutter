@@ -55,4 +55,20 @@ class Socks5ServerHandler {
   }
 }
 
+  void _sendSocks5Reply(Socket clientSocket, Socket remSocket) {
+    final reply = BytesBuilder()
+      ..addByte(5) // SOCKS version
+      ..addByte(0) // Connection succeeded
+      ..addByte(0) // Reserved
+
+      ..addByte(remSocket.address.type == InternetAddressType.IPv4
+          ? 1
+          : 4) // Address type
+
+      ..add(remSocket.address.rawAddress) // Address
+      ..addByte(remSocket.port >> 8) // Port (high byte)
+      ..addByte(remSocket.port & 0xFF); // Port (low byte)
+
+    clientSocket.add(reply.toBytes());
+  }
 enum States { handshake, handling, proxying }
