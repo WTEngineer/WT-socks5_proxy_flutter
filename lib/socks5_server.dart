@@ -53,6 +53,26 @@ class Socks5ServerHandler {
         throw Exception('Unknown address type: $addrType');
     }
   }
+// Handler for TCP transfer and relaying data
+class TcpTransferHandler {
+  final String address;
+  final Addr addr;
+  final int port;
+  late final Socket remSocket;
+
+  TcpTransferHandler(this.address, this.addr, this.port);
+
+  Future<void> connectAndRelay({required Socket clientSocket}) async {
+    try {
+      Socket remSocket = await _connectToRemote();
+      _sendSocks5Reply(clientSocket, remSocket);
+
+      _relayTraffic(clientSocket, remSocket);
+    } catch (e) {
+      log.severe('Connection failed: $e');
+      clientSocket.close();
+    }
+  }
 }
 
   void _sendSocks5Reply(Socket clientSocket, Socket remSocket) {
@@ -71,4 +91,8 @@ class Socks5ServerHandler {
 
     clientSocket.add(reply.toBytes());
   }
+
+
+}
+
 enum States { handshake, handling, proxying }
